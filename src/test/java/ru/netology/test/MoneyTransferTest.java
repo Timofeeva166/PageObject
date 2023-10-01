@@ -88,4 +88,54 @@ public class MoneyTransferTest {
         $("[data-test-id = error-notification]").shouldBe(Condition.visible);
     }
 
+    @Test
+    public void transferWithKopecks() { //перевод суммы с дробной частью (копейками)
+        var loginPage = new LoginPage();
+        var authInfo = DataHelper.getAuthInfo();
+
+        var verificationPage = loginPage.validLogin(authInfo);
+        var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
+
+        var dashboardPage = verificationPage.validVerify(verificationCode);
+
+        var firstCard = DataHelper.getFirstCardInfo();
+        var secondCard = DataHelper.getSecondCardInfo();
+
+        var firstCardBalance = dashboardPage.getCardBalance(firstCard);
+        var secondCardBalance = dashboardPage.getCardBalance(secondCard);
+
+        var sum = "55.77";
+
+        var transferPage = dashboardPage.chooseCardForTransfer(firstCard);
+        dashboardPage = transferPage.ValidTransfer(sum, secondCard);
+        dashboardPage.reload();
+
+        assertEquals(firstCardBalance + Double.parseDouble(sum), dashboardPage.getCardBalance(firstCard));
+        assertEquals(secondCardBalance - Double.parseDouble(sum), dashboardPage.getCardBalance(secondCard));
+    }
+
+    @Test
+    public void transferSumMoreThatIsInTheCard() { //перевод большей суммы денег, чем есть на карте
+        var loginPage = new LoginPage();
+        var authInfo = DataHelper.getAuthInfo();
+
+        var verificationPage = loginPage.validLogin(authInfo);
+        var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
+
+        var dashboardPage = verificationPage.validVerify(verificationCode);
+
+        var firstCard = DataHelper.getFirstCardInfo();
+        var secondCard = DataHelper.getSecondCardInfo();
+
+        var firstCardBalance = dashboardPage.getCardBalance(firstCard);
+        var secondCardBalance = dashboardPage.getCardBalance(secondCard);
+
+        var sum = String.valueOf(firstCardBalance + 100);
+
+        var transferPage = dashboardPage.chooseCardForTransfer(secondCard);
+        transferPage.Transfer(sum, firstCard);
+
+        $("[data-test-id = error-notification]").shouldHave(Condition.exactText("Недостаточно " +
+                "средств на счёте. Измените сумму или пополните счет.")).shouldBe(Condition.visible);
+    }
 }
