@@ -4,6 +4,8 @@ import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 import ru.netology.data.DataHelper;
 
+import java.time.Duration;
+
 import static com.codeborne.selenide.Selenide.$;
 
 public class TransferPage {
@@ -17,15 +19,19 @@ public class TransferPage {
         amount.shouldBe(Condition.visible);
     }
 
-    public void Transfer(String sum, DataHelper.CardInfo cardInfo) { //заполнение полей
+    public void transfer(String sum, DataHelper.CardInfo cardInfo) { //заполнение полей
         amount.setValue(sum);
         from.setValue(cardInfo.getCardNumber());
         transferButton.click();
     }
 
-    public DashboardPage ValidTransfer(String sum, DataHelper.CardInfo cardInfo) { //верное заполнение полей с возвратом на Dashboard Page
-        Transfer(sum, cardInfo);
+    public DashboardPage validTransfer(String sum, DataHelper.CardInfo cardInfo) { //верное заполнение полей с возвратом на Dashboard Page
+        transfer(sum, cardInfo);
         return new DashboardPage();
+    }
+
+    public void errorNotification (String text) {
+        errorNotification.shouldHave(Condition.text(text), Duration.ofSeconds(10)).shouldBe(Condition.visible);
     }
 
 }

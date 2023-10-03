@@ -19,16 +19,16 @@ public class DashboardPage {
         page.shouldBe(Condition.visible);
     }
 
-    public int getCardBalance(DataHelper.CardInfo cardInfo) {
+    public double getCardBalance(DataHelper.CardInfo cardInfo) {
         var text = cards.findBy(Condition.attribute("data-test-id", cardInfo.getCardIndex())).getText();
         return extractBalance(text);
     }
 
-    private int extractBalance(String text) {
+    private double extractBalance(String text) {
         var start = text.indexOf(balanceStart);
         var finish = text.indexOf(balanceFinish);
         var value = text.substring(start + balanceStart.length(), finish);
-        return Integer.parseInt(value);
+        return Double.parseDouble(value);
     }
 
     public TransferPage chooseCardForTransfer(DataHelper.CardInfo cardInfo) {

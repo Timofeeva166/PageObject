@@ -1,11 +1,10 @@
 package ru.netology.test;
-import com.codeborne.selenide.Condition;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.netology.data.DataHelper;
 import ru.netology.page.LoginPage;
 
-import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,7 +16,7 @@ public class MoneyTransferTest {
     }
 
     @Test
-    public void TransferFromFirstToSecond() { //перевод с первой на вторую
+    public void transferFromFirstToSecond() { //перевод с первой на вторую
         var loginPage = new LoginPage();
         var authInfo = DataHelper.getAuthInfo();
 
@@ -35,7 +34,7 @@ public class MoneyTransferTest {
         var sum = "190";
 
         var transferPage = dashboardPage.chooseCardForTransfer(secondCard);
-        dashboardPage = transferPage.ValidTransfer(sum, firstCard);
+        dashboardPage = transferPage.validTransfer(sum, firstCard);
         dashboardPage.reload();
 
         assertEquals(firstCardBalance - Integer.parseInt(sum), dashboardPage.getCardBalance(firstCard));
@@ -43,7 +42,7 @@ public class MoneyTransferTest {
     }
 
     @Test
-    public void TransferFromSecondToFirst() { //перевод с второй на первую
+    public void transferFromSecondToFirst() { //перевод с второй на первую
         var loginPage = new LoginPage();
         var authInfo = DataHelper.getAuthInfo();
 
@@ -61,7 +60,7 @@ public class MoneyTransferTest {
         var sum = "190";
 
         var transferPage = dashboardPage.chooseCardForTransfer(firstCard);
-        dashboardPage = transferPage.ValidTransfer(sum, secondCard);
+        dashboardPage = transferPage.validTransfer(sum, secondCard);
         dashboardPage.reload();
 
         assertEquals(firstCardBalance + Integer.parseInt(sum), dashboardPage.getCardBalance(firstCard));
@@ -83,9 +82,9 @@ public class MoneyTransferTest {
         var sum = "190";
 
         var transferPage = dashboardPage.chooseCardForTransfer(firstCard);
-        transferPage.Transfer(sum, incorrectCard);
+        transferPage.transfer(sum, incorrectCard);
 
-        $("[data-test-id = error-notification]").shouldBe(Condition.visible);
+        transferPage.errorNotification("Произошла ошибка");
     }
 
     @Test
@@ -107,7 +106,7 @@ public class MoneyTransferTest {
         var sum = "55.77";
 
         var transferPage = dashboardPage.chooseCardForTransfer(firstCard);
-        dashboardPage = transferPage.ValidTransfer(sum, secondCard);
+        dashboardPage = transferPage.validTransfer(sum, secondCard);
         dashboardPage.reload();
 
         assertEquals(firstCardBalance + Double.parseDouble(sum), dashboardPage.getCardBalance(firstCard));
@@ -133,9 +132,8 @@ public class MoneyTransferTest {
         var sum = String.valueOf(firstCardBalance + 100);
 
         var transferPage = dashboardPage.chooseCardForTransfer(secondCard);
-        transferPage.Transfer(sum, firstCard);
+        transferPage.transfer(sum, firstCard);
 
-        $("[data-test-id = error-notification]").shouldHave(Condition.exactText("Недостаточно " +
-                "средств на счёте. Измените сумму или пополните счет.")).shouldBe(Condition.visible);
+        transferPage.errorNotification("Недостаточно средств на счёте. Измените сумму или пополните счет.");
     }
 }
